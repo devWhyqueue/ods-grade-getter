@@ -149,7 +149,6 @@ public class ShowGradesActivity extends AppCompatActivity {
          */
         private static final String ARG_SEMESTER_NUMBER = "semester_number";
         private static final String ARG_SEMESTER_GRADES = "semester_grades";
-        private static int semester = 1;
 
         public PlaceholderFragment() {
         }
@@ -158,11 +157,12 @@ public class ShowGradesActivity extends AppCompatActivity {
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(ArrayList<String> subjectsGrades) {
+        public static PlaceholderFragment newInstance(int position, ArrayList<String>
+                subjectsGrades) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
             args.putStringArrayList(ARG_SEMESTER_GRADES, subjectsGrades);
-            args.putInt(ARG_SEMESTER_NUMBER, semester++);
+            args.putInt(ARG_SEMESTER_NUMBER, position);
             fragment.setArguments(args);
             return fragment;
         }
@@ -193,7 +193,7 @@ public class ShowGradesActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(gradesPerSemesterStr.get(position + 1));
+            return PlaceholderFragment.newInstance((position + 1), gradesPerSemesterStr.get(position + 1));
         }
 
         @Override
