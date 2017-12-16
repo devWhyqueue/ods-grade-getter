@@ -190,8 +190,6 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-
-            mPassword = "j)pR{I{:LgTWJJFgJft8";
             try {
                 mPassword = URLEncoder.encode(mPassword, "UTF-8");
             } catch (UnsupportedEncodingException e) {
