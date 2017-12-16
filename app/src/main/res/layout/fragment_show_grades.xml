@@ -12,7 +12,18 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.queisler.ods_grade_getter.ShowGradesActivity$PlaceholderFragment">
 
+    <TextView
+        android:id="@+id/heading_semester"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="TextView"
+        android:textAllCaps="false"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textStyle="bold" />
+
     <ListView
+        android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

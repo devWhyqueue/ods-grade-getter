@@ -3,8 +3,8 @@ package de.queisler.ods_grade_getter;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -146,7 +147,8 @@ public class LoginActivity extends AppCompatActivity {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener
+                    (new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
@@ -154,7 +156,8 @@ public class LoginActivity extends AppCompatActivity {
             });
 
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener
+                    (new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -167,6 +170,7 @@ public class LoginActivity extends AppCompatActivity {
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -175,6 +179,8 @@ public class LoginActivity extends AppCompatActivity {
 
         private final String mEmail;
         private String mPassword;
+        private String loginPage;
+        private boolean locked = true;
         private String sidd;
 
         UserLoginTask(String email, String password) {
@@ -184,41 +190,55 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-            mPassword = "j)pR{I{:LgTWJJFgJft8";
 
+            mPassword = "j)pR{I{:LgTWJJFgJft8";
             try {
                 mPassword = URLEncoder.encode(mPassword, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-               return false;
+                return false;
             }
 
             final WebView webView = findViewById(R.id.web_view);
             webView.post(new Runnable() {
                 @Override
-                public void run()  {
-                    webView.setWebViewClient(new myWebClient());
-                    final String loginURL = "https://ods.fh-dortmund" + "" +
-                            ".de/ods?Sicht=WFUebergang&LIMod=&HttpRequest_PathFile=%2F&HttpRequest_Path=%2F&RemoteEndPointIP" +
-                            "=10.11.15.121&User=" + mEmail + "&PWD=" + mPassword + "&x=0&y=0";
-                    webView.loadUrl(loginURL);
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
+                public void run() {
+                    webView.getSettings().setJavaScriptEnabled(true);
+                    webView.addJavascriptInterface(new MyJavaScriptInterface(LoginActivity
+                            .this), "HtmlViewer");
+                    webView.setWebViewClient(new WebViewClient() {
                         @Override
-                        public void run() {
-                            if(webView.getUrl().contains("SIDD")){
-                                sidd = webView.getUrl().substring(webView.getUrl().indexOf("SIDD="));
-                                sidd = sidd.substring(5);
-                            }
+                        public void onPageFinished(WebView view, String url) {
+                            webView.loadUrl("javascript:window.HtmlViewer.showHTML" + "" + "" + "" +
+                                    "('<html>'+document.getElementsByTagName('html')[0]" + "" + "" +
+                                    ".innerHTML+'</html>');");
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (webView.getUrl().contains("SIDD")) {
+                                        sidd = webView.getUrl().substring(webView.getUrl()
+                                                .indexOf("SIDD="));
+                                        sidd = sidd.substring(5);
+                                    }
+                                    locked = false;
+                                }
+                            }, 5000);
                         }
-                    }, 5000);
+                    });
+                    final String loginURL = "https://ods.fh-dortmund" + "" + "" + "" +
+                            ".de/ods?Sicht=WFUebergang&LIMod=&HttpRequest_PathFile=%2F" +
+                            "&HttpRequest_Path=%2F&RemoteEndPointIP" + "=10.11.15.121&User=" +
+                            mEmail + "&PWD=" + mPassword + "&x=0&y=0";
+                    webView.loadUrl(loginURL);
                 }
             });
-            try {
-                Thread.sleep(5500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
+            while (locked) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } // Lock
 
             return sidd != null;
         }
@@ -244,21 +264,19 @@ public class LoginActivity extends AppCompatActivity {
             mAuthTask = null;
             showProgress(false);
         }
-    }
-    public class myWebClient extends WebViewClient
-    {
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            // TODO Auto-generated method stub
-            super.onPageStarted(view, url, favicon);
-        }
 
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            // TODO Auto-generated method stub
+        class MyJavaScriptInterface {
 
-            view.loadUrl(url);
-            return true;
+            private Context ctx;
+
+            MyJavaScriptInterface(Context ctx) {
+                this.ctx = ctx;
+            }
+
+            @JavascriptInterface
+            public void showHTML(String html) {
+                UserLoginTask.this.loginPage = html;
+            }
 
         }
     }
