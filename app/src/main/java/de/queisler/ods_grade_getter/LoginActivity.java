@@ -22,10 +22,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.GeneralSecurityException;
 
 import de.queisler.ods_grade_getter.data.ProtectedConfigFile;
 
@@ -76,14 +74,12 @@ public class LoginActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.login_progress);
 
         try {
-            if (!ProtectedConfigFile.loadCredentials(getApplicationContext())[0].isEmpty()) {
+            if (ProtectedConfigFile.loadCredentials(getApplicationContext()) != null) {
                 String[] cred = ProtectedConfigFile.loadCredentials(getApplicationContext());
                 mEmailView.setText(cred[0]);
                 mPasswordView.setText(cred[1]);
             }
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -209,9 +205,7 @@ public class LoginActivity extends AppCompatActivity {
 
             try {
                 ProtectedConfigFile.saveCredentials(mEmail, mPassword, getApplicationContext());
-            } catch (GeneralSecurityException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -231,9 +225,9 @@ public class LoginActivity extends AppCompatActivity {
                     webView.setWebViewClient(new WebViewClient() {
                         @Override
                         public void onPageFinished(WebView view, String url) {
-                            webView.loadUrl("javascript:window.HtmlViewer.showHTML" + "" + "" + "" +
-                                    "('<html>'+document.getElementsByTagName('html')[0]" + "" + "" +
-                                    ".innerHTML+'</html>');");
+                            webView.loadUrl("javascript:window.HtmlViewer.showHTML" + "" + "" +
+                                    "" + "('<html>'+document.getElementsByTagName('html')[0]" +
+                                    "" + "" + ".innerHTML+'</html>');");
                             new Handler().postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
@@ -247,7 +241,7 @@ public class LoginActivity extends AppCompatActivity {
                             }, 5000);
                         }
                     });
-                    final String loginURL = "https://ods.fh-dortmund" + "" + "" + "" +
+                    final String loginURL = "https://ods.fh-dortmund" + "" + "" + "" + "" +
                             ".de/ods?Sicht=WFUebergang&LIMod=&HttpRequest_PathFile=%2F" +
                             "&HttpRequest_Path=%2F&RemoteEndPointIP" + "=10.11.15.121&User=" +
                             mEmail + "&PWD=" + mPassword + "&x=0&y=0";
