@@ -22,8 +22,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
+
+import de.queisler.ods_grade_getter.data.ProtectedConfigFile;
 
 /**
  * A login screen that offers login via email/password.
@@ -70,6 +74,18 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        try {
+            if (!ProtectedConfigFile.loadCredentials(getApplicationContext())[0].isEmpty()) {
+                String[] cred = ProtectedConfigFile.loadCredentials(getApplicationContext());
+                mEmailView.setText(cred[0]);
+                mPasswordView.setText(cred[1]);
+            }
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -127,12 +143,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.length() > 4;
+        return true;
     }
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return true;
     }
 
     /**
@@ -177,7 +193,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
+        private String mEmail;
         private String mPassword;
         private String loginPage;
         private boolean locked = true;
@@ -190,7 +206,15 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            
+
+            try {
+                ProtectedConfigFile.saveCredentials(mEmail, mPassword, getApplicationContext());
+            } catch (GeneralSecurityException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             try {
                 mPassword = URLEncoder.encode(mPassword, "UTF-8");
             } catch (UnsupportedEncodingException e) {

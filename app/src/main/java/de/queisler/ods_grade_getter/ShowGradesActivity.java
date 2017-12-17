@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -14,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -61,6 +63,7 @@ public class ShowGradesActivity extends AppCompatActivity {
 
     // DATA
     private Map<Integer, ArrayList<String>> gradesPerSemesterStr = new LinkedHashMap<>();
+    private double gradePointAverage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +77,16 @@ public class ShowGradesActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = getIntent();
-                finish();
-                startActivity(intent);
+                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(ShowGradesActivity.this);
+                dlgAlert.setMessage("Dein Notendurchschnitt ist: " + gradePointAverage);
+                dlgAlert.setTitle("Notendurchschnitt");
+                dlgAlert.setCancelable(true);
+                dlgAlert.setPositiveButton("Super...", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //dismiss the dialog
+                    }
+                });
+                dlgAlert.create().show();
             }
         });
 
@@ -277,13 +287,17 @@ public class ShowGradesActivity extends AppCompatActivity {
                     grades = new LinkedHashMap<>();
                 }
             }
+            int numGrades = 0;
             for (Map.Entry<Integer, Map<String, Double>> entry : gradesPerSemester.entrySet()) {
                 ArrayList<String> strList = new ArrayList<>();
                 for (Map.Entry<String, Double> innerEntry : entry.getValue().entrySet()) {
                     strList.add(innerEntry.getKey() + ": " + innerEntry.getValue());
+                    gradePointAverage += innerEntry.getValue();
+                    numGrades++;
                 }
                 gradesPerSemesterStr.put(entry.getKey(), strList);
             }
+            gradePointAverage = Math.floor((gradePointAverage / numGrades) * 10d) / 10d;
         }
 
         @Override
