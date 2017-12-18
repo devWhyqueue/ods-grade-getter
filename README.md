@@ -12,6 +12,7 @@ Mithilfe der App ist es möglich sich mit der FH-Kennung und seinem Passwort der
 
 ### Security Concerns
 Die App speichert automatisch die Login-Daten in einer Textdatei im internen Speicher.
+
 **DIESE TEXTDATEI IST ZUM JETZIGEN ENTWICKLUNGSSTAND NOCH UNVERSCHLÜSSELT!**
 
 Bitte benutzen Sie die Anwendung auf eigene Gefahr!
