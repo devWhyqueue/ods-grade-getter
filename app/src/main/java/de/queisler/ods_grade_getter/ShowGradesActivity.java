@@ -55,6 +55,8 @@ public class ShowGradesActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
     private View mProgressView;
+    private TextView mLoadingView;
+    private FloatingActionButton fab;
 
     /**
      * Keep track of the task to ensure we can cancel it if requested.
@@ -73,7 +75,7 @@ public class ShowGradesActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,6 +94,7 @@ public class ShowGradesActivity extends AppCompatActivity {
 
         mProgressView = findViewById(R.id.parse_progress);
         mViewPager = findViewById(R.id.container);
+        mLoadingView = findViewById(R.id.loading_text2);
 
         showProgress(true);
         mParseGradesTask = new ParseGradesTask(getIntent().getExtras().getString("sidd"));
@@ -125,6 +128,7 @@ public class ShowGradesActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
+            fab.setVisibility(show ? View.GONE : View.VISIBLE);
             mViewPager.setVisibility(show ? View.GONE : View.VISIBLE);
             mViewPager.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
                 @Override
@@ -134,6 +138,7 @@ public class ShowGradesActivity extends AppCompatActivity {
             });
 
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mLoadingView.setVisibility(show ? View.VISIBLE : View.GONE);
             mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener
                     (new AnimatorListenerAdapter() {
                 @Override
@@ -145,7 +150,9 @@ public class ShowGradesActivity extends AppCompatActivity {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mLoadingView.setVisibility(show ? View.VISIBLE : View.GONE);
             mViewPager.setVisibility(show ? View.GONE : View.VISIBLE);
+            fab.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 
