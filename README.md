@@ -6,6 +6,3 @@ Einfach auschecken und mithilfe von Gradle kompilieren.
 
 ### Prerequisites
 Android Studio
-
-### Specification
-Mithilfe der App ist es möglich sich mit der FH-Kennung und seinem Passwort der FH Dortmund anzumelden und eine Übersicht der Noten gruppiert nach Semester abzurufen.
