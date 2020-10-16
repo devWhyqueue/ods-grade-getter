@@ -1,9 +1,9 @@
-package de.queisler.ods_grade_getter;
+package de.devwhyqueue.odsgradegetter;
 
 import android.content.Context;
 
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,10 +18,9 @@ import static org.junit.Assert.assertEquals;
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
     @Test
-    public void useAppContext() throws Exception {
+    public void useAppContext() {
         // Context of the app under test.
-        Context appContext = ApplicationProvider.getApplicationContext();
-
-        assertEquals("de.queisler.ods_grade_getter", appContext.getPackageName());
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        assertEquals("de.devwhyqueue.odsgradegetter", appContext.getPackageName());
     }
 }
